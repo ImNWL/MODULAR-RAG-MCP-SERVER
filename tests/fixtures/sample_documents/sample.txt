@@ -1,0 +1,20 @@
+# Sample Document for Testing
+
+This is a minimal sample document used for testing the ingestion pipeline.
+
+## Section 1: Introduction
+
+This document serves as a placeholder for testing purposes. It contains
+basic text content that can be used to verify document loading, chunking,
+and other ingestion operations.
+
+## Section 2: Content
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
+tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+veniam, quis nostrud exercitation ullamco laboris.
+
+## Section 3: Conclusion
+
+This concludes the sample document. The content above should be sufficient
+for basic smoke tests and fixture validation.
