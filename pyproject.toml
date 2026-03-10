@@ -1,0 +1,91 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "modular-rag-mcp-server"
+version = "0.1.0"
+description = "A modular RAG (Retrieval-Augmented Generation) system with MCP (Model Context Protocol) integration"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "Peacher"}
+]
+keywords = ["rag", "mcp", "llm", "retrieval", "embedding"]
+
+dependencies = [
+    # Core
+    "pyyaml>=6.0",
+    "pydantic>=2.0",
+    
+    # MCP SDK
+    "mcp>=1.0.0",
+    
+    # LLM & Embedding
+    "openai>=1.0.0",
+    "httpx>=0.25.0",
+    
+    # Vector Store
+    "chromadb>=0.4.0",
+    
+    # Text Processing
+    "langchain-text-splitters>=0.0.1",
+    
+    # PDF Processing
+    "markitdown>=0.0.1",
+    
+    # BM25 Sparse Retrieval
+    "rank-bm25>=0.2.2",
+    
+    # Observability
+    "structlog>=23.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+    "streamlit>=1.28.0",
+]
+
+rerank = [
+    "sentence-transformers>=2.2.0",
+]
+
+eval = [
+    "ragas>=0.1.0",
+]
+
+[project.scripts]
+rag-server = "main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*", "mcp_server*", "core*", "ingestion*", "libs*", "observability*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests", 
+    "e2e: End-to-end tests",
+    "slow: Slow tests",
+]
+asyncio_mode = "auto"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
