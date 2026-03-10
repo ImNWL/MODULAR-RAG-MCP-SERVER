@@ -133,7 +133,7 @@ def _get_nested_value(data: dict, path: str) -> Any:
 
 
 def _validate_required_fields(data: dict) -> None:
-    """Validate that required fields are present."""
+    """Validate that required fields are present in raw config dict."""
     required_fields = [
         "llm.provider",
         "llm.model",
@@ -150,6 +150,53 @@ def _validate_required_fields(data: dict) -> None:
     
     if missing:
         raise SettingsError(f"Missing required configuration fields: {', '.join(missing)}")
+
+
+def validate_settings(settings: "Settings") -> None:
+    """Validate a Settings object for required fields and constraints.
+    
+    This function provides centralized validation for Settings objects,
+    ensuring all required fields are present and valid.
+    
+    Args:
+        settings: The Settings object to validate
+        
+    Raises:
+        SettingsError: If validation fails, with clear error message indicating
+                      which field is missing or invalid
+    """
+    errors = []
+    
+    if not settings.llm.provider:
+        errors.append("llm.provider")
+    if not settings.llm.model:
+        errors.append("llm.model")
+    if not settings.embedding.provider:
+        errors.append("embedding.provider")
+    if not settings.embedding.model:
+        errors.append("embedding.model")
+    if settings.embedding.dimensions <= 0:
+        errors.append("embedding.dimensions (must be positive)")
+    
+    if not settings.vector_store.provider:
+        errors.append("vector_store.provider")
+    
+    if settings.retrieval.dense_top_k <= 0:
+        errors.append("retrieval.dense_top_k (must be positive)")
+    if settings.retrieval.sparse_top_k <= 0:
+        errors.append("retrieval.sparse_top_k (must be positive)")
+    if settings.retrieval.fusion_top_k <= 0:
+        errors.append("retrieval.fusion_top_k (must be positive)")
+    
+    if settings.ingestion.chunk_size <= 0:
+        errors.append("ingestion.chunk_size (must be positive)")
+    if settings.ingestion.chunk_overlap < 0:
+        errors.append("ingestion.chunk_overlap (must be non-negative)")
+    if settings.ingestion.chunk_overlap >= settings.ingestion.chunk_size:
+        errors.append("ingestion.chunk_overlap (must be less than chunk_size)")
+    
+    if errors:
+        raise SettingsError(f"Invalid settings: {', '.join(errors)}")
 
 
 def _parse_llm_settings(data: dict) -> LLMSettings:
@@ -250,7 +297,7 @@ def load_settings(path: Optional[str] = None) -> Settings:
     eval_data = data.get("evaluation", {})
     obs_data = data.get("observability", {})
     
-    return Settings(
+    settings = Settings(
         llm=_parse_llm_settings(data),
         embedding=_parse_embedding_settings(data),
         vision_llm=_parse_vision_settings(data),
@@ -284,3 +331,6 @@ def load_settings(path: Optional[str] = None) -> Settings:
         ),
         ingestion=_parse_ingestion_settings(data),
     )
+    
+    validate_settings(settings)
+    return settings
